@@ -1,0 +1,456 @@
+Data Scientist Role Play: Profiling and Analyzing the Yelp Dataset Coursera Worksheet
+
+This is a 2-part assignment. In the first part, you are asked a series of questions that will help you profile and understand the data just like a data scientist would. For this first part of the assignment, you will be assessed both on the correctness of your findings, as well as the code you used to arrive at your answer. You will be graded on how easy your code is to read, so remember to use proper formatting and comments where necessary.
+
+In the second part of the assignment, you are asked to come up with your own inferences and analysis of the data for a particular research question you want to answer. You will be required to prepare the dataset for the analysis you choose to do. As with the first part, you will be graded, in part, on how easy your code is to read, so use proper formatting and comments to illustrate and communicate your intent as required.
+
+For both parts of this assignment, use this "worksheet." It provides all the questions you are being asked, and your job will be to transfer your answers and SQL coding where indicated into this worksheet so that your peers can review your work. You should be able to use any Text Editor (Windows Notepad, Apple TextEdit, Notepad ++, Sublime Text, etc.) to copy and paste your answers. If you are going to use Word or some other page layout application, just be careful to make sure your answers and code are lined appropriately.
+In this case, you may want to save as a PDF to ensure your formatting remains intact for you reviewer.
+
+
+
+Part 1: Yelp Dataset Profiling and Understanding
+
+1. Profile the data by finding the total number of records for each of the tables below:
+
+	SELECT COUNT(*)
+	FROM table;
+	
+i. Attribute table = 10,000
+ii. Business table = 10,000
+iii. Category table = 10,000
+iv. Checkin table = 10,000
+v. elite_years table = 10,000
+vi. friend table = 10,000
+vii. hours table = 10,000
+viii. photo table = 10,000
+ix. review table = 10,000
+x. tip table = 10,000
+xi. user table = 10,000
+	
+
+
+2. Find the total distinct records by either the foreign key or primary key for each table. If two foreign keys are listed in the table, please specify which foreign key.
+-- (P) = Primary Key: id
+-- (F) = Foreign Key: business_id & user_id
+
+	SELECT COUNT(DISTINCT(key)) 
+	FROM table
+
+i. Business = 	(P)id: 10000 |						|
+ii. Hours = 				 | (F)business_id: 1562	|
+iii. Category = 			 | (F)business_id: 2643 |
+iv. Attribute = 			 | (F)business_id: 1115 |
+v. Review = 	(P)id: 10000 | (F)business_id: 8090	| (F)user_id: 9581	
+vi. Checkin = 				 | (F)business_id: 493  |
+vii. Photo = 	(P)id: 10000 | (F)business_id: 6493 |
+viii. Tip = 				 | (F)business_id: 3979 | (F)user_id: 537
+ix. User = 		(P)id: 10000 |						|
+x. Friend = 				 | 						| (F)user_id: 11
+xi. Elite_years = 			 |						| (F)user_id: 2780	
+
+
+
+3. Are there any columns with null values in the Users table? Indicate "yes," or "no."
+	
+	Answer: "no"
+	
+	
+	SELECT 
+		SUM(CASE WHEN name is null then 1 else 0 end) AS name 
+		, SUM(CASE WHEN review_count is null then 1 else 0 end) AS review_count 
+		, SUM(CASE WHEN yelping_since is null then 1 else 0 end) AS yelping_since
+		, SUM(CASE WHEN useful is null then 1 else 0 end) AS useful
+		, SUM(CASE WHEN funny is null then 1 else 0 end) AS funny
+		, SUM(CASE WHEN cool is null then 1 else 0 end) AS cool
+		, SUM(CASE WHEN fans is null then 1 else 0 end) AS fans
+		, SUM(CASE WHEN average_stars is null then 1 else 0 end) AS average_stars
+		, SUM(CASE WHEN compliment_hot is null then 1 else 0 end) AS compliment_hot
+		, SUM(CASE WHEN compliment_more is null then 1 else 0 end) AS compliment_more
+		, SUM(CASE WHEN compliment_profile is null then 1 else 0 end) AS compliment_profile
+		, SUM(CASE WHEN compliment_cute is null then 1 else 0 end) AS compliment_cute
+		, SUM(CASE WHEN compliment_list is null then 1 else 0 end) AS compliment_list
+		, SUM(CASE WHEN compliment_note is null then 1 else 0 end) AS compliment_note
+		, SUM(CASE WHEN compliment_plain is null then 1 else 0 end) AS compliment_plain
+		, SUM(CASE WHEN compliment_cool is null then 1 else 0 end) AS compliment_cool
+		, SUM(CASE WHEN compliment_funny is null then 1 else 0 end) AS compliment_funny
+		, SUM(CASE WHEN compliment_writer is null then 1 else 0 end) AS compliment_writer
+		, SUM(CASE WHEN compliment_photos is null then 1 else 0 end) AS compliment_photos
+	FROM user 
+	
+
+	
+4. For each table and column listed below, display the smallest (minimum), largest (maximum), and average (mean) value for the following fields:
+
+	SELECT MIN(column) AS min		
+		, MAX(column) AS max
+		, AVG(column) AS avg
+	FROM table
+
+	i. Table: Review, Column: Stars
+	
+		min: 1		max: 5	 	avg: 3.7082
+		
+	
+	ii. Table: Business, Column: Stars
+	
+		min: 1		max: 5		avg: 3.6549
+		
+	
+	iii. Table: Tip, Column: Likes
+	
+		min: 0		max: 2		avg: 0.0144
+		
+	
+	iv. Table: Checkin, Column: Count
+	
+		min: 1		max: 53		avg: 1.9414
+		
+	
+	v. Table: User, Column: Review_count
+	
+		min: 0		max: 2000		avg: 24.2995
+		
+
+
+5. List the cities with the most reviews in descending order:
+
+	SQL code used to arrive at answer:
+	SELECT city
+		, SUM(review_count) AS Total_Reviews
+	FROM business
+	GROUP BY city
+	ORDER BY Total_Reviews DESC	
+	
++-----------------+---------------+
+| city            | Total_Reviews |
++-----------------+---------------+
+| Las Vegas       |         82854 |
+| Phoenix         |         34503 |
+| Toronto         |         24113 |
+| Scottsdale      |         20614 |
+| Charlotte       |         12523 |
+| Henderson       |         10871 |
+| Tempe           |         10504 |
+| Pittsburgh      |          9798 |
+| Montréal        |          9448 |
+| Chandler        |          8112 |
+| Mesa            |          6875 |
+| Gilbert         |          6380 |
+| Cleveland       |          5593 |
+| Madison         |          5265 |
+| Glendale        |          4406 |
+| Mississauga     |          3814 |
+| Edinburgh       |          2792 |
+| Peoria          |          2624 |
+| North Las Vegas |          2438 |
+| Markham         |          2352 |
+| Champaign       |          2029 |
+| Stuttgart       |          1849 |
+| Surprise        |          1520 |
+| Lakewood        |          1465 |
+| Goodyear        |          1155 |
++-----------------+---------------+
+
+	
+6. Find the distribution of star ratings to the business in the following cities:
+
+i. Avon
+
+SQL code used to arrive at answer:
+	SELECT DISTINCT(stars) AS Star_Rating
+		, SUM(review_count) AS Count
+	FROM business
+	WHERE city LIKE 'avon'
+	GROUP BY stars
+	ORDER BY stars ASC
+
++-------------+-------+
+| Star_Rating | Count |
++-------------+-------+
+|         1.5 |    10 |
+|         2.5 |     6 |
+|         3.5 |    88 |
+|         4.0 |    21 |
+|         4.5 |    31 |
+|         5.0 |     3 |
++-------------+-------+
+	
+ii. Beachwood
+
+SQL code used to arrive at answer:
+	SELECT DISTINCT(stars) AS Star_Rating
+		, SUM(review_count) AS Count
+	FROM business
+	WHERE city LIKE 'BEACHWOOD'
+	GROUP BY stars
+	ORDER BY stars ASC
+
++-------------+-------+
+| Star_Rating | Count |
++-------------+-------+
+|         2.0 |     8 |
+|         2.5 |     3 |
+|         3.0 |    11 |
+|         3.5 |     6 |
+|         4.0 |    69 |
+|         4.5 |    17 |
+|         5.0 |    23 |
++-------------+-------+
+
+
+7. Find the top 3 users based on their total number of reviews:
+		
+	SQL code used to arrive at answer:
+	
+	SELECT Name
+		, review_count AS Total_Number_of_Reviews
+	FROM user
+	ORDER BY review_count DESC
+	LIMIT 3
+		
++--------+-------------------------+
+| name   | Total_Number_of_Reviews |
++--------+-------------------------+
+| Gerald |                    2000 |
+| Sara   |                    1629 |
+| Yuri   |                    1339 |
++--------+-------------------------+
+
+
+8. Does posing more reviews correlate with more fans?
+	
+/*By determining whether or not there is a relationship between review_count and fans (as to say, (positive correlation) when one increases the other will increase, or, (negative correlation) if one increases the other will decrease, we first need to find the following:
+review_count = x  |  fans = y
+CALCULATIONS
+SUM x 				=	242,995
+SUM y 				=	14,896
+SUM x*y				=	5,626,520	
+SUM x squared 		=	62,107,995		--> SELECT SUM((review_count*review_count)) AS SUM_Xsquared FROM user
+SUM y squared 		=	1,150,280		--> SELECT SUM((fans*fans)) AS SUM_Ysquared FROM user
+# data in EACH		= 	10,000
+Correlation --> (10,000 * 5,626,520 - (242,995 * 14,896) /SquareRoot[10,000 * 62,107,995 - (242,995)^2][10,000 * 1,150,280 - (14,896)^2]
+Correlation (r) 	= 	0.66
+	In summary, based upon the correlation coefficient of 0.66, there is a moderate positive relationship between review_count and fans.
+	Ultimately, the more reviews one writes, the more exposure one has, which increases the odds of other reviewers seeing said review(s) and becoming a fan. 
+	*This, to be clear, does not have a direct causation, meaning one does not cause the other.*
+*/
+
+	
+9. Are there more reviews with the word "love" or with the word "hate" in them?
+
+	Answer: This answer excludes words like "loved" and "hated". If the stakeholder wanted to include variations, then; love: 1780 | hate: 232
++------------+------------+
+| Love_Count | Hate_Count |
++------------+------------+
+|       1080 |         82 |
++------------+------------+
+	
+	SELECT SUM(text LIKE '% love %') AS Love_Count
+		, SUM(text LIKE '% hate %') AS Hate_Count
+	FROM review
+
+	
+	
+10. Find the top 10 users with the most fans:
+
+	SQL code used to arrive at answer:
+	SELECT name AS User
+		, fans AS Fans
+	FROM user
+	ORDER BY fans DESC
+	LIMIT 10
+	
++-----------+------+
+| User      | Fans |
++-----------+------+
+| Amy       |  503 |
+| Mimi      |  497 |
+| Harald    |  311 |
+| Gerald    |  253 |
+| Christine |  173 |
+| Lisa      |  159 |
+| Cat       |  133 |
+| William   |  126 |
+| Fran      |  124 |
+| Lissa     |  120 |
++-----------+------+
+		
+    
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Part 2: Inferences and Analysis
+
+1. Pick one city and category of your choice and group the businesses in that city or category by their overall star rating. Compare the businesses with 2-3 stars to the businesses with 4-5 stars and answer the following questions. Include your code.
+	
+i. Do the two groups you chose to analyze have a different distribution of hours?
+SELECT b.name
+	, b.stars
+	, h.hours
+    , CASE
+    WHEN b.stars BETWEEN '2' AND '3' THEN 'Low Rating'
+    WHEN b.stars BETWEEN '4' AND '5' THEN 'High Rating'
+    ELSE NULL
+    END AS Restaurant_Rating
+FROM ((business b JOIN category c ON b.id = c.business_id) 
+    JOIN hours h ON b.id = h.business_id)
+WHERE b.city LIKE '%phoenix%' AND category LIKE '%Restaurants%' 
+AND (B.stars BETWEEN '2' AND '3' OR B.stars BETWEEN '4' AND '5')
+group by h.hours
+ORDER BY b.stars DESC
+
++----------------------------------------+-------+-----------------------+-------------------+
+| name                                   | stars | hours                 | Restaurant_Rating |
++----------------------------------------+-------+-----------------------+-------------------+
+| Charlie D's Catfish & Chicken          |   4.5 | Friday|11:00-18:00    | High Rating       |
+| Charlie D's Catfish & Chicken          |   4.5 | Monday|11:00-18:00    | High Rating       |
+| Charlie D's Catfish & Chicken          |   4.5 | Saturday|11:00-18:00  | High Rating       |
+| Charlie D's Catfish & Chicken          |   4.5 | Sunday|13:00-16:00    | High Rating       |
+| Charlie D's Catfish & Chicken          |   4.5 | Thursday|11:00-18:00  | High Rating       |
+| Charlie D's Catfish & Chicken          |   4.5 | Tuesday|11:00-18:00   | High Rating       |
+| Charlie D's Catfish & Chicken          |   4.5 | Wednesday|11:00-18:00 | High Rating       |
+| Bootleggers Modern American Smokehouse |   4.0 | Friday|11:00-22:00    | High Rating       |
+| Bootleggers Modern American Smokehouse |   4.0 | Monday|11:00-22:00    | High Rating       |
+| Bootleggers Modern American Smokehouse |   4.0 | Saturday|11:00-22:00  | High Rating       |
+| Bootleggers Modern American Smokehouse |   4.0 | Sunday|11:00-22:00    | High Rating       |
+| Bootleggers Modern American Smokehouse |   4.0 | Thursday|11:00-22:00  | High Rating       |
+| Bootleggers Modern American Smokehouse |   4.0 | Tuesday|11:00-22:00   | High Rating       |
+| Bootleggers Modern American Smokehouse |   4.0 | Wednesday|11:00-22:00 | High Rating       |
+| Gallagher's                            |   3.0 | Friday|11:00-2:00     | Low Rating        |
+| Gallagher's                            |   3.0 | Monday|11:00-0:00     | Low Rating        |
+| Gallagher's                            |   3.0 | Saturday|9:00-2:00    | Low Rating        |
+| Gallagher's                            |   3.0 | Sunday|9:00-0:00      | Low Rating        |
+| Gallagher's                            |   3.0 | Thursday|11:00-2:00   | Low Rating        |
+| Gallagher's                            |   3.0 | Tuesday|11:00-0:00    | Low Rating        |
+| Gallagher's                            |   3.0 | Wednesday|11:00-0:00  | Low Rating        |
+| McDonald's                             |   2.0 | Friday|5:00-0:00      | Low Rating        |
+| McDonald's                             |   2.0 | Monday|5:00-23:00     | Low Rating        |
+| McDonald's                             |   2.0 | Saturday|5:00-0:00    | Low Rating        |
+| McDonald's                             |   2.0 | Sunday|5:00-23:00     | Low Rating        |
+| McDonald's                             |   2.0 | Thursday|5:00-23:00   | Low Rating        |
+| McDonald's                             |   2.0 | Tuesday|5:00-23:00    | Low Rating        |
+| McDonald's                             |   2.0 | Wednesday|5:00-23:00  | Low Rating        |
++----------------------------------------+-------+-----------------------+-------------------+
+
+ANSWER: Yes, Restaurants with a "High Rating" have less operational hours compared to the other restauraunts that have a "Low Rating".
+		I would assume the less time you take of an employee, the happier the employee is, the better the experience for the customer. More data would need to be analyzed to confirm or deny hypothesis. 
+
+ii. Do the two groups you chose to analyze have a different number of reviews?
+
+SELECT SUM(b.review_count) AS Number_of_Reviews
+    , CASE
+    WHEN b.stars BETWEEN '2' AND '3' THEN 'Low Rating'
+    WHEN b.stars BETWEEN '4' AND '5' THEN 'High Rating'
+    ELSE NULL
+    END AS Restaurant_Rating
+FROM business b
+JOIN category c 
+ON b.id = c.business_id
+WHERE b.city LIKE '%phoenix%' AND category LIKE '%Restaurants%' 
+AND (b.stars BETWEEN '2' AND '3' OR b.stars BETWEEN '4' AND '5')
+group by Restaurant_Rating
+order by Restaurant_Rating ASC
++-------------------+-------------------+
+| Number_of_Reviews | Restaurant_Rating |
++-------------------+-------------------+
+|               626 | High Rating       |
+|                68 | Low Rating        |
++-------------------+-------------------+
+
+ANSWER: Yes, the two groups have a large review count gap. I would assume this is due to popularity by word of mouth. People will always share polar opposite experiences (Amazing vs terrible) and that may affect customer count at those restaurants. More data analysis needed to confirm or deny hypothesis.
+
+iii. Are you able to infer anything from the location data provided between these two groups? Explain.
+ANSWER: As it relates to a businesses location, there are a lot of factors that may affect the success for that said business. Demographics, Accessibility and visibility, Competition, Neighborhood safety, Business regulations, Affordability, Space necessities. All restaurants have a different postal code, and there was no trend or pattern as to where the High rated ones were located compared to the Low rated locations.
+
+SQL code used for analysis:
+SELECT b.postal_code
+    , CASE
+    WHEN b.stars BETWEEN '2' AND '3' THEN 'Low Rating'
+    WHEN b.stars BETWEEN '4' AND '5' THEN 'High Rating'
+    ELSE NULL
+    END AS Restaurant_Rating
+FROM business b
+JOIN category c 
+ON b.id = c.business_id
+WHERE b.city LIKE '%phoenix%' AND category LIKE '%Restaurants%' 
+AND (b.stars BETWEEN '2' AND '3' OR b.stars BETWEEN '4' AND '5')
+order by Restaurant_Rating ASC
+		
+		
+2. Group business based on the ones that are open and the ones that are closed. What differences can you find between the ones that are still open and the ones that are closed? List at least two differences and the SQL code you used to arrive at your answer.
+
+i. Difference 1: Open locations have 23x more written reviews on average compared to closed locations. (Sample size: Open 4, Closed 1)
+
+ii. Difference 2: Open locations have roughly 250 more reviews on average compared to closed locations. (Sample size: Open 4, Closed 1)
+
+SQL code used for analysis:
+SELECT b.is_open
+    , COUNT(re.text) AS AVG_Written_Review_Count
+    , ROUND(AVG(b.review_count)) AS AVG_Review_Count
+    , b.name
+    , CASE
+    WHEN b.stars BETWEEN '2' AND '3' THEN 'Low Rating'
+    WHEN b.stars BETWEEN '4' AND '5' THEN 'High Rating'
+    ELSE NULL
+    END AS Restaurant_Rating
+FROM (((business b JOIN category c ON b.id = c.business_id)
+    LEFT JOIN review re ON b.id = re.business_id)
+    LEFT JOIN hours h ON b.id = h.business_id)
+WHERE b.city LIKE '%phoenix%' AND category LIKE '%Restaurants%' 
+AND (b.stars BETWEEN '2' AND '3' OR b.stars BETWEEN '4' AND '5')
+GROUP BY b.is_open
+ORDER BY b.stars DESC
+	
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+3. For this last part of your analysis, you are going to choose the type of analysis you want to conduct on the Yelp dataset and are going to prepare the data for analysis.
+
+Ideas for analysis include: Parsing out keywords and business attributes for sentiment analysis, clustering businesses to find commonalities or anomalies between them, predicting the overall star rating for a business, predicting the number of fans a user will have, and so on. These are just a few examples to get you started, so feel free to be creative and come up with your own problem you want to solve. Provide answers, in-line, to all of the following:
+	
+i. Indicate the type of analysis you chose to do: Ideally, if this class allowed me to extract data I would prefer to do an analysis based on the location using Tableau. However, because of the limitations, I will discover whether or not the star rating by each user has a correlation with the amount of fans you can receieve. 
+
+ii. Write 1-2 brief paragraphs on the type of data you will need for your analysis and why you chose that data:
+In order to receieve the results I need, I have to work around some limitations of this current DBMS (SQLite). Firstly, I cannot extract data from my queries to then work in excel, r, python, etc. Also, this DBMS will only allow me to view 25 records, so i will need to filter the data to allow no more than 50 records (DESC/ ASC will give me top 25 and bottom 25 results); ideally, i would like to keep this under 25 records for all intensive purposes. With that said I will need to analyze the data to fall into two categories (columns): stars and the ratio of (average stars) multiplied by (fans/number of reviews). This will give me a fair ratio between the relationship amongst those 3 columns. Lastly, I will need access to the following columnns: average_stars, fans, and review_count.
+
+iii. Output of your finished dataset:
+
++-------+------------------------------+
+| Stars | reviewcount_stars_fans_ratio |
++-------+------------------------------+
+|   2.1 |                         0.15 |
+|   2.7 |                         0.13 |
+|   3.0 |                         0.09 |
+|   3.1 |                         0.25 |
+|   3.2 |                          0.1 |
+|   3.3 |                         0.48 |
+|   3.4 |                         0.13 |
+|   3.5 |                         0.37 |
+|   3.6 |                         0.16 |
+|   3.7 |                         0.29 |
+|   3.8 |                         0.36 |
+|   3.9 |                         0.29 |
+|   4.0 |                         0.31 |
+|   4.1 |                         0.07 |
+|   4.2 |                         1.91 |
+|   4.3 |                         0.58 |
+|   4.4 |                         0.33 |
+|   4.5 |                         0.65 |
+|   4.6 |                         0.74 |
+|   4.7 |                         0.29 |
+|   4.8 |                         1.21 |
++-------+------------------------------+
+
+iv. Provide the SQL code you used to create your final dataset:
+
+SELECT ROUND(average_stars,1) AS Stars
+, ROUND(average_stars * CAST(u.fans AS FLOAT)/(u.review_count),2) AS reviewcount_stars_fans_ratio
+FROM user u
+WHERE review_count > 5                --this was simply because the DBMS on coursera only allows you to view 25 rows of data,...  
+AND Fans > 5                          --...so i had to alter the data to give me workable amount
+AND reviewcount_stars_fans_ratio < 2  --outlier occured inside 4.3 stars, this code removes that for a more accurate result
+GROUP BY ROUND(average_stars,1)
+ORDER BY Stars ASC
+
+ANSWER: Results of the pearson correlation indicated that there is a significant large positive relationship between X and Y, (r(19) = .505, p = .020). This essentially means, if a reviewer gives a business a higher rating, that reviewer has increased their odds of receiving a fan.  This may point to the fact that people enjoy reading positive reviews with a higher rating. If you are trying to receive more fans on Yelp, I recommend finding the positives of that business to be able to rate them higher. If there is constructive feedback, leave that in the comments and don't allow it to weigh so heavily on how many stars you give a business. Kindness is contageous after all
